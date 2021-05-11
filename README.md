@@ -1,6 +1,35 @@
 # use-ie8
 兼容ie8
+ie hack 
+“-″减号是IE6专有的hack
+“\9″ IE6/IE7/IE8/IE9/IE10都生效
+“\0″ IE8/IE9/IE10都生效，是IE8/9/10的hack
+“\9\0″ 只对IE9/IE10生效，是IE9/10的hack
 
+只在IE下生效
+<!--[if IE]>
+这段文字只在IE浏览器显示
+<![endif]-->
+
+只在IE6下生效
+<!--[if IE 6]>
+这段文字只在IE6浏览器显示
+<![endif]-->
+
+只在IE6以上版本生效
+<!--[if gte IE 6]>
+这段文字只在IE6以上(包括)版本IE浏览器显示
+<![endif]-->
+
+只在IE8上不生效
+<!--[if ! IE 8]>
+这段文字在非IE8浏览器显示
+<![endif]-->
+
+非IE浏览器生效
+<!--[if !IE]>
+这段文字只在非IE浏览器显示
+<![endif]-->
 ## 部分解决方案
     1、echarts兼容ie8，https://echarts.apache.org/zh/builder.html
         解决：使用5.0版本一下的echarts.js，并选择兼容ie8，这里采用4.5.0版本
@@ -14,9 +43,12 @@
         background: rgba(9,30,66,.04);
         color: hsla(0,0%,100%,1)\9;
 		filter: alpha(opacity=60)\9;
+
+        background-color: #000000 \9;
+	    filter: alpha(opacity=67)\9;
     4、echarts层级问题，给外层父级元素设置position:relative;z-index:1;(将父级元素设置为定位元素，然后设置层级)
     5、forEach()  ie8  兼容
-        if ( √√ ) {
+        if ( !Array.prototype.forEach ) {
         Array.prototype.forEach = function forEach( callback, thisArg ) {
             var T, k;
             if ( this == null ) {
@@ -47,10 +79,10 @@
         border-radius: 50%;
 		behavior: url("/enterprise/htc/PIE.htc");
     7、阴影问题
-        建议ie8放弃（效果太差），改为边框
-        border-top: 1px solid #DCDFE6 \9;
+        建议ie8放弃（使用PIE效果太差），改为边框
+        border: 1px solid #DCDFE6 \9;
 		border-color:#DCDFE6 \9;
-		box-sizing: content-box \9;
+		box-sizing: border-box \9;
     8、Object.defineProperty
         <script>
 			var origDefineProperty = Object.defineProperty;
@@ -72,7 +104,7 @@
 			if (!supportsDescriptors) {
 				Object.defineProperty = function (a, b, c) {
 					//IE8支持修改元素节点的属性
-					if (origDefineProperty && a.nodeType == 1) {
+					if (origDefineProperty6 && a.nodeType == 1) {
 						return origDefineProperty(a, b, c);
 					} else {
 						a[b] = c.value || (c.get && c.get());
@@ -118,3 +150,26 @@
                 };
             }
         }(window._console));
+    10，background: rgba(255, 109, 112, 0.06); 兼容
+        filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#19ff6d70,endColorstr=#19ff6d70);
+        rgba 和 IE 的 filter数值转换
+        0.1     19
+        0.2     33
+        0.3     4C
+        0.4     66
+        0.5     7F
+        0.6     99
+        0.7     B2
+        0.8     C8
+        0.9     E5
+        ff6d70为正常的颜色
+    11、background-size:cover 兼容ie8解决方案
+        -ms-filter: "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='path_relative_to_the_HTML_file', sizingMethod='scale')";
+        （src为图片地址）
+        示例 ：
+            background-repeat: no-repeat;
+            background-image: url(/enterprise/img/beijing@2x.png);
+            background-size: cover;
+            background-image: none \9;
+            background-image: url(/enterprise/img/beijing@2x.png) \9\0;
+            -ms-filter: "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='/enterprise/img/beijing@2x.png', sizingMethod='scale')";
